@@ -20,21 +20,57 @@ from typing import Optional
 from datetime import datetime
 import uuid
 
-from busy_bee.api.app import create_app as create_v2_app
-from busy_bee_holdings_llc.api.schemas import BriefRequest, DecisionRequest, DecisionResponse
-from busy_bee_holdings_llc.briefing.service import ExecutiveBriefService
-from busy_bee_holdings_llc.governance.engine import GovernanceEngine
-from busy_bee_holdings_llc.governance.policy import load_default_policy
-from busy_bee_holdings_llc.ownership.cap_table import default_cap_table
+# Optional imports (may not be available in all environments)
+try:
+    from busy_bee.api.app import create_app as create_v2_app
+except ImportError:
+    create_v2_app = None
+
+try:
+    from busy_bee_holdings_llc.api.schemas import BriefRequest, DecisionRequest, DecisionResponse
+except ImportError:
+    BriefRequest, DecisionRequest, DecisionResponse = None, None, None
+
+try:
+    from busy_bee_holdings_llc.briefing.service import ExecutiveBriefService
+except ImportError:
+    ExecutiveBriefService = None
+
+try:
+    from busy_bee_holdings_llc.governance.engine import GovernanceEngine
+except ImportError:
+    GovernanceEngine = None
+
+try:
+    from busy_bee_holdings_llc.governance.policy import load_default_policy
+except ImportError:
+    load_default_policy = None
+
+try:
+    from busy_bee_holdings_llc.ownership.cap_table import default_cap_table
+except ImportError:
+    default_cap_table = None
 
 # Product layer imports
-from app.product import (
-    ProductRecommendation,
-    ExecutiveBrief,
-    ExecutiveSystemView,
-    DashboardView,
-)
-from app.application import ExecutiveOrchestrator
+try:
+    from app.product import (
+        ProductRecommendation,
+        ExecutiveBrief,
+        ExecutiveSystemView,
+        DashboardView,
+    )
+except ImportError:
+    ProductRecommendation, ExecutiveBrief, ExecutiveSystemView, DashboardView = None, None, None, None
+
+try:
+    from app.application import ExecutiveOrchestrator
+except ImportError:
+    ExecutiveOrchestrator = None
+
+# Auth and billing imports
+from app.api import auth as auth_router
+from app.api import billing as billing_router
+from app.api import demo as demo_router
 
 try:
     from tree_engine.api import router as tree_router
@@ -60,18 +96,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-policy = load_default_policy()
-engine = GovernanceEngine(policy=policy, cap_table=default_cap_table())
-brief_service = ExecutiveBriefService()
+# Initialize services (optional)
+policy = load_default_policy() if load_default_policy else None
+engine = GovernanceEngine(policy=policy, cap_table=default_cap_table()) if GovernanceEngine and load_default_policy and default_cap_table else None
+brief_service = ExecutiveBriefService() if ExecutiveBriefService else None
 
 # Initialize ExecutiveOrchestrator
-orchestrator = ExecutiveOrchestrator()
+orchestrator = ExecutiveOrchestrator() if ExecutiveOrchestrator else None
 
 # In-memory storage for recommendations (would be DB in production)
-_recommendations_db: dict[str, ProductRecommendation] = {}
+_recommendations_db: dict[str, ProductRecommendation] = {} if ProductRecommendation else {}
 
+# Include routers
 if tree_router is not None:
     app.include_router(tree_router)
+
+# Auth routes
+app.include_router(auth_router.router)
+
+# Billing routes
+app.include_router(billing_router.router)
+
+# Demo mode routes
+app.include_router(demo_router.router)
 
 
 # ==================== HEALTH & STATUS ====================
@@ -355,10 +402,14 @@ def evaluate_decision(payload: DecisionRequest) -> DecisionResponse:
 
 # ==================== MOUNT V2 ====================
 
-# Mount /v2 endpoints from the imported Busy Bee V2 app.
-v2_app = create_v2_app()
-app.mount("/v2", v2_app)
+# Mount /v2 endpoints from the imported Busy Bee V2 app (optional)
+if create_v2_app:
+    v2_app = create_v2_app()
+    app.mount("/v2", v2_app)
 
-# Include chat API
-from app.api.chat import router as chat_router
-app.include_router(chat_router)
+# Include chat API (optional)
+try:
+    from app.api.chat import router as chat_router
+    app.include_router(chat_router)
+except ImportError:
+    pass
