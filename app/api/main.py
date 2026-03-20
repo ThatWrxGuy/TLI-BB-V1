@@ -78,6 +78,7 @@ from app.api import profile as profile_router
 from app.api import admin as admin_router
 from app.api import push_notifications as push_router
 from app.api import upload as upload_router
+from app.api import websocket as websocket_router
 
 try:
     from tree_engine.api import router as tree_router
@@ -147,6 +148,9 @@ app.include_router(push_router.router)
 
 # File Upload routes
 app.include_router(upload_router.router)
+
+# WebSocket routes
+app.include_router(websocket_router.router, tags=["WebSocket"])
 
 
 # ==================== HEALTH & STATUS ====================
