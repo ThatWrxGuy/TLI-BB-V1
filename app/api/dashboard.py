@@ -25,6 +25,7 @@ recommendations_db: dict[str, list[dict]] = {}
 activity_db: dict[str, list[dict]] = {}
 notifications_db: dict[str, list[dict]] = {}
 mood_db: dict[str, list[dict]] = {}
+tasks_db: dict[str, list[dict]] = {}
 
 
 # ==================== ENUMS ====================
@@ -942,4 +943,231 @@ async def get_enhanced_dashboard(
         notifications=[NotificationItem(**n) for n in notifs],
         charts=charts,
         generated_at=datetime.utcnow().isoformat()
+    )
+
+
+# ==================== TASKS (Todo List) ====================
+
+class TaskItem(BaseModel):
+    """Task item."""
+    id: str
+    title: str
+    description: Optional[str] = None
+    is_completed: bool = False
+    priority: str = "medium"  # low, medium, high
+    due_date: Optional[str] = None
+    created_at: str
+    completed_at: Optional[str] = None
+
+
+class TasksResponse(BaseModel):
+    """Tasks response."""
+    tasks: List[TaskItem]
+    total: int
+    completed: int
+    pending: int
+
+
+@router.get("/tasks", response_model=TasksResponse)
+async def get_tasks(
+    current_user: User = Depends(get_current_user),
+    filter: Optional[str] = None  # all, pending, completed
+):
+    """Get user tasks (todo list)."""
+    
+    user_id = current_user.id
+    
+    # Generate demo tasks if none exist
+    if user_id not in tasks_db:
+        tasks_db[user_id] = [
+            {
+                "id": str(uuid.uuid4()),
+                "title": "Review quarterly goals",
+                "description": "Check progress on Q1 objectives",
+                "is_completed": False,
+                "priority": "high",
+                "due_date": (datetime.utcnow() + timedelta(days=2)).strftime("%Y-%m-%d"),
+                "created_at": (datetime.utcnow() - timedelta(days=3)).isoformat(),
+                "completed_at": None
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "title": "Schedule team meeting",
+                "description": "Weekly sync with the team",
+                "is_completed": True,
+                "priority": "medium",
+                "due_date": (datetime.utcnow() - timedelta(days=1)).strftime("%Y-%m-%d"),
+                "created_at": (datetime.utcnow() - timedelta(days=5)).isoformat(),
+                "completed_at": (datetime.utcnow() - timedelta(days=1)).isoformat()
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "title": "Update LinkedIn profile",
+                "description": "Add recent achievements",
+                "is_completed": False,
+                "priority": "low",
+                "due_date": None,
+                "created_at": (datetime.utcnow() - timedelta(days=1)).isoformat(),
+                "completed_at": None
+            },
+            {
+                "id": str(uuid.uuid4()),
+                "title": "Prepare presentation",
+                "description": "Q1 results presentation for Friday",
+                "is_completed": False,
+                "priority": "high",
+                "due_date": (datetime.utcnow() + timedelta(days=4)).strftime("%Y-%m-%d"),
+                "created_at": datetime.utcnow().isoformat(),
+                "completed_at": None
+            }
+        ]
+    
+    tasks = tasks_db[user_id]
+    
+    # Filter if requested
+    if filter == "pending":
+        tasks = [t for t in tasks if not t["is_completed"]]
+    elif filter == "completed":
+        tasks = [t for t in tasks if t["is_completed"]]
+    
+    total = len(tasks_db[user_id])
+    completed = sum(1 for t in tasks_db[user_id] if t["is_completed"])
+    pending = total - completed
+    
+    return TasksResponse(
+        tasks=[TaskItem(**t) for t in tasks],
+        total=total,
+        completed=completed,
+        pending=pending
+    )
+
+
+@router.post("/tasks")
+async def create_task(
+    title: str,
+    description: Optional[str] = None,
+    priority: str = "medium",
+    due_date: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new task."""
+    
+    valid_priorities = ["low", "medium", "high"]
+    if priority not in valid_priorities:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid priority. Valid: {valid_priorities}"
+        )
+    
+    user_id = current_user.id
+    
+    if user_id not in tasks_db:
+        tasks_db[user_id] = []
+    
+    task = {
+        "id": str(uuid.uuid4()),
+        "title": title,
+        "description": description,
+        "is_completed": False,
+        "priority": priority,
+        "due_date": due_date,
+        "created_at": datetime.utcnow().isoformat(),
+        "completed_at": None
+    }
+    
+    tasks_db[user_id].append(task)
+    
+    return {"message": "Task created", "task": TaskItem(**task)}
+
+
+@router.patch("/tasks/{task_id}")
+async def update_task(
+    task_id: str,
+    title: Optional[str] = None,
+    description: Optional[str] = None,
+    priority: Optional[str] = None,
+    due_date: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Update a task."""
+    
+    user_id = current_user.id
+    
+    if user_id not in tasks_db:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No tasks found"
+        )
+    
+    for task in tasks_db[user_id]:
+        if task["id"] == task_id:
+            if title is not None:
+                task["title"] = title
+            if description is not None:
+                task["description"] = description
+            if priority is not None:
+                task["priority"] = priority
+            if due_date is not None:
+                task["due_date"] = due_date
+            
+            return {"message": "Task updated", "task": TaskItem(**task)}
+    
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Task not found"
+    )
+
+
+@router.patch("/tasks/{task_id}/toggle")
+async def toggle_task(
+    task_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Toggle task completion status."""
+    
+    user_id = current_user.id
+    
+    if user_id not in tasks_db:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No tasks found"
+        )
+    
+    for task in tasks_db[user_id]:
+        if task["id"] == task_id:
+            task["is_completed"] = not task["is_completed"]
+            task["completed_at"] = datetime.utcnow().isoformat() if task["is_completed"] else None
+            
+            status = "completed" if task["is_completed"] else "uncompleted"
+            return {"message": f"Task {status}", "task": TaskItem(**task)}
+    
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Task not found"
+    )
+
+
+@router.delete("/tasks/{task_id}")
+async def delete_task(
+    task_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Delete a task."""
+    
+    user_id = current_user.id
+    
+    if user_id not in tasks_db:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No tasks found"
+        )
+    
+    for i, task in enumerate(tasks_db[user_id]):
+        if task["id"] == task_id:
+            deleted = tasks_db[user_id].pop(i)
+            return {"message": "Task deleted", "task": TaskItem(**deleted)}
+    
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Task not found"
     )
