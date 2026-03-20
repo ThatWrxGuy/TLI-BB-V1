@@ -72,6 +72,7 @@ from app.api import auth as auth_router
 from app.api import billing as billing_router
 from app.api import demo as demo_router
 from app.api import onboarding as onboarding_router
+from app.api import dashboard as dashboard_router
 
 try:
     from tree_engine.api import router as tree_router
@@ -123,6 +124,9 @@ app.include_router(demo_router.router)
 
 # Onboarding routes
 app.include_router(onboarding_router.router)
+
+# Dashboard routes
+app.include_router(dashboard_router.router)
 
 
 # ==================== HEALTH & STATUS ====================
