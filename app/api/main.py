@@ -74,6 +74,9 @@ from app.api import demo as demo_router
 from app.api import onboarding as onboarding_router
 from app.api import dashboard as dashboard_router
 from app.api import finance as finance_router
+from app.api import profile as profile_router
+from app.api import admin as admin_router
+from app.api import push_notifications as push_router
 
 try:
     from tree_engine.api import router as tree_router
@@ -131,6 +134,15 @@ app.include_router(dashboard_router.router)
 
 # Finance routes (Plaid)
 app.include_router(finance_router.router)
+
+# Profile & Settings routes
+app.include_router(profile_router.router)
+
+# Admin routes
+app.include_router(admin_router.router)
+
+# Push Notifications routes
+app.include_router(push_router.router)
 
 
 # ==================== HEALTH & STATUS ====================
