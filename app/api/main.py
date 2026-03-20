@@ -73,6 +73,7 @@ from app.api import billing as billing_router
 from app.api import demo as demo_router
 from app.api import onboarding as onboarding_router
 from app.api import dashboard as dashboard_router
+from app.api import finance as finance_router
 
 try:
     from tree_engine.api import router as tree_router
@@ -127,6 +128,9 @@ app.include_router(onboarding_router.router)
 
 # Dashboard routes
 app.include_router(dashboard_router.router)
+
+# Finance routes (Plaid)
+app.include_router(finance_router.router)
 
 
 # ==================== HEALTH & STATUS ====================
