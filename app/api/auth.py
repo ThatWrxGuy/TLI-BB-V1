@@ -217,11 +217,76 @@ async def signup(request: SignUpRequest):
     # TODO: Send verification email
     print(f"📧 Verification email would be sent to {request.email}")
     print(f"🔗 Verification link: /auth/verify?token={verification_token}")
+
+
+# Admin secret key (should be in environment variables)
+ADMIN_SECRET_KEY = "busy-bee-admin-2024"
+
+
+class AdminSignupRequest(BaseModel):
+    """Admin signup request."""
+    email: EmailStr
+    password: str
+    full_name: Optional[str] = None
+    admin_secret: str  # Secret key to create admin account
+
+
+class AdminSignupResponse(BaseModel):
+    """Admin signup response."""
+    message: str
+    user_id: str
+    role: str
+    admin_panel_url: str
+
+
+@router.post("/admin-signup", response_model=AdminSignupResponse)
+async def admin_signup(request: AdminSignupRequest):
+    """Register a new admin account. Requires secret key."""
     
-    return SignUpResponse(
-        message="Account created successfully. Please verify your email.",
+    # Verify admin secret
+    if request.admin_secret != ADMIN_SECRET_KEY:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid admin secret key"
+        )
+    
+    # Check if user already exists
+    if request.email.lower() in users_by_email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered"
+        )
+    
+    # Create admin user ID and verification token
+    user_id = secrets.token_urlsafe(16)
+    verification_token = secrets.token_urlsafe(32)
+    
+    # Create admin user record
+    user_data = {
+        "id": user_id,
+        "email": request.email.lower(),
+        "full_name": request.full_name or "Admin",
+        "password_hash": hash_password(request.password),
+        "role": UserRole.ADMIN.value,  # Admin role
+        "is_verified": True,  # Admins are auto-verified
+        "is_active": True,
+        "subscription_tier": SubscriptionTier.ENTERPRISE.value,  # Enterprise for admins
+        "verification_token": None,
+        "verification_expires": None,
+        "created_at": datetime.utcnow().isoformat(),
+        "updated_at": datetime.utcnow().isoformat(),
+    }
+    
+    users_db[user_id] = user_data
+    users_by_email[request.email.lower()] = user_id
+    
+    print(f"👑 Admin account created: {request.email} (ID: {user_id})")
+    
+    return AdminSignupResponse(
+        message="Admin account created successfully",
         user_id=user_id,
-        verification_required=True
+        role="admin",
+        admin_panel_url="/admin"
     )
 
 
