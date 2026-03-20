@@ -10,6 +10,7 @@ import Profile from './pages/Profile'
 import Settings from './pages/Settings'
 import Finance from './pages/Finance'
 import Admin from './pages/Admin'
+import Analytics from './pages/Analytics'
 import Onboarding from './pages/Onboarding'
 import Demo from './pages/Demo'
 
@@ -94,6 +95,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Admin />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="analytics" 
+            element={
+              <ProtectedRoute>
+                <Analytics />
               </ProtectedRoute>
             } 
           />

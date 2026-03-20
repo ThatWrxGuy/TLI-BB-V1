@@ -172,4 +172,22 @@ export const uploadAPI = {
   deleteFile: (fileId) => api.delete(`/upload/files/${fileId}`),
 }
 
+// Analytics API
+export const analyticsAPI = {
+  trackEvent: (eventType, eventName, eventData) => 
+    api.post('/analytics/track', { event_type: eventType, event_name: eventName, event_data: eventData }),
+  
+  getUserStats: () => api.get('/analytics/users/stats'),
+  getUserActivity: (days) => api.get('/analytics/users/activity', { params: { days } }),
+  
+  getDashboard: () => api.get('/analytics/dashboard'),
+  getRevenue: () => api.get('/analytics/revenue'),
+  getUsage: (days) => api.get('/analytics/usage', { params: { days } }),
+  getRetention: () => api.get('/analytics/retention'),
+  getEvents: (eventType, limit) => api.get('/analytics/events', { params: { event_type: eventType, limit } }),
+  getFunnels: () => api.get('/analytics/funnels'),
+  getCohorts: () => api.get('/analytics/cohorts'),
+  exportAnalytics: (format, days) => api.get('/analytics/export', { params: { format, days } }),
+}
+
 export default api
