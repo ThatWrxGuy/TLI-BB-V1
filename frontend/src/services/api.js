@@ -138,4 +138,38 @@ export const demoAPI = {
   endDemo: (token) => api.post('/demo/end', { demo_token: token }),
 }
 
+// Upload API
+export const uploadAPI = {
+  uploadAvatar: async (file) => {
+    const formData = new FormData()
+    formData.append('file', {
+      uri: file.uri,
+      type: file.type || 'image/jpeg',
+      name: file.name || 'avatar.jpg'
+    })
+    return api.post('/upload/avatar', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+  },
+  
+  deleteAvatar: () => api.delete('/upload/avatar'),
+  
+  uploadFile: async (file, category) => {
+    const formData = new FormData()
+    formData.append('file', {
+      uri: file.uri,
+      type: file.type || 'application/octet-stream',
+      name: file.name || 'file'
+    })
+    if (category) formData.append('category', category)
+    return api.post('/upload/file', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+  },
+  
+  listFiles: (category) => api.get('/upload/files', { params: { category } }),
+  
+  deleteFile: (fileId) => api.delete(`/upload/files/${fileId}`),
+}
+
 export default api

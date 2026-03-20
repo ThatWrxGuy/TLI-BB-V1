@@ -77,4 +77,26 @@ export const profileAPI = {
     api.post('/profile/password', { current_password: currentPassword, new_password: newPassword }),
 }
 
+// Upload API (Web only)
+export const uploadAPI = {
+  uploadAvatar: async (file) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return api.post('/upload/avatar', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+  },
+  deleteAvatar: () => api.delete('/upload/avatar'),
+  uploadFile: async (file, category) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    if (category) formData.append('category', category)
+    return api.post('/upload/file', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+  },
+  listFiles: (category) => api.get('/upload/files', { params: { category } }),
+  deleteFile: (fileId) => api.delete(`/upload/files/${fileId}`),
+}
+
 export default api

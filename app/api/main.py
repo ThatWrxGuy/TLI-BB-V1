@@ -77,6 +77,7 @@ from app.api import finance as finance_router
 from app.api import profile as profile_router
 from app.api import admin as admin_router
 from app.api import push_notifications as push_router
+from app.api import upload as upload_router
 
 try:
     from tree_engine.api import router as tree_router
@@ -143,6 +144,9 @@ app.include_router(admin_router.router)
 
 # Push Notifications routes
 app.include_router(push_router.router)
+
+# File Upload routes
+app.include_router(upload_router.router)
 
 
 # ==================== HEALTH & STATUS ====================
