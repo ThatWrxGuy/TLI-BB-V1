@@ -1,0 +1,141 @@
+import axios from 'axios'
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+// Add auth token to requests
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`
+  }
+  return config
+})
+
+// Handle auth errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token')
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  }
+)
+
+// Auth API
+export const authAPI = {
+  login: (email, password) => 
+    api.post('/auth/login', new URLSearchParams({ username: email, password })),
+  
+  signup: (email, password, fullName) => 
+    api.post('/auth/signup', { email, password, full_name: fullName }),
+  
+  logout: () => api.post('/auth/logout'),
+  
+  getMe: () => api.get('/auth/me'),
+  
+  verifyEmail: (token) => api.post('/auth/verify', { token }),
+  
+  resetPassword: (email) => api.post('/auth/password-reset-request', { email }),
+  
+  resetPasswordConfirm: (token, newPassword) => 
+    api.post('/auth/password-reset-confirm', { token, new_password: newPassword }),
+  
+  oauth: (provider) => api.get(`/auth/oauth/${provider}`),
+}
+
+// Dashboard API
+export const dashboardAPI = {
+  getDashboard: () => api.get('/dashboard'),
+  getOverview: () => api.get('/dashboard/overview'),
+  getGoals: () => api.get('/dashboard/goals'),
+  createGoal: (title, description) => api.post('/dashboard/goals', null, { params: { title, description } }),
+  updateGoal: (id, progress, status) => api.patch(`/dashboard/goals/${id}`, null, { params: { progress, status } }),
+  getTasks: (filter) => api.get('/dashboard/tasks', { params: { filter } }),
+  createTask: (title, description, priority, dueDate) => 
+    api.post('/dashboard/tasks', null, { params: { title, description, priority, due_date: dueDate } }),
+  toggleTask: (id) => api.patch(`/dashboard/tasks/${id}/toggle`),
+  getRecommendations: () => api.get('/dashboard/recommendations'),
+  completeRecommendation: (id) => api.post(`/dashboard/recommendations/${id}/complete`),
+  getDomainScores: () => api.get('/dashboard/domain-scores'),
+  getMood: () => api.get('/dashboard/mood'),
+  logMood: (mood, note) => api.post('/dashboard/mood', { mood, note }),
+  getCalendar: () => api.get('/dashboard/calendar'),
+  getCharts: () => api.get('/dashboard/charts'),
+  getNotifications: () => api.get('/dashboard/notifications'),
+  getQuickActions: () => api.get('/dashboard/quick-actions'),
+}
+
+// Finance API
+export const financeAPI = {
+  getAccounts: () => api.get('/finance/accounts'),
+  linkAccount: (publicToken) => api.post('/finance/plaid/link', { public_token: publicToken }),
+  getTransactions: (params) => api.get('/finance/transactions', { params }),
+  getInsights: (days) => api.get('/finance/insights', { params: { days } }),
+  getNetWorth: () => api.get('/finance/net-worth'),
+  getMonthly: (months) => api.get('/finance/monthly', { params: { months } }),
+  unlinkAccount: (id) => api.delete(`/finance/accounts/${id}`),
+}
+
+// Profile API
+export const profileAPI = {
+  getProfile: () => api.get('/profile'),
+  updateProfile: (data) => api.patch('/profile', data),
+  getSettings: () => api.get('/profile/settings'),
+  updateSettings: (data) => api.patch('/profile/settings', data),
+  changePassword: (currentPassword, newPassword) => 
+    api.post('/profile/password', { current_password: currentPassword, new_password: newPassword }),
+  getTwoFactorStatus: () => api.get('/profile/two-factor/status'),
+  setupTwoFactor: () => api.get('/profile/two-factor/setup'),
+  enableTwoFactor: (code) => api.post('/profile/two-factor/enable', { code }),
+  disableTwoFactor: () => api.post('/profile/two-factor/disable'),
+  getSessions: () => api.get('/profile/sessions'),
+  revokeSession: (id) => api.delete(`/profile/sessions/${id}`),
+  requestExport: () => api.post('/profile/export'),
+  getExportStatus: (id) => api.get(`/profile/export/${id}`),
+  deleteAccount: () => api.delete('/profile/account'),
+}
+
+// Billing API
+export const billingAPI = {
+  getPrices: () => api.get('/billing/prices'),
+  createCheckout: (priceId) => api.post('/billing/checkout', { price_id: priceId }),
+  getPortal: () => api.get('/billing/portal'),
+  getSubscription: () => api.get('/billing/subscription'),
+  cancelSubscription: () => api.post('/billing/subscription/cancel'),
+}
+
+// Admin API
+export const adminAPI = {
+  getStats: () => api.get('/admin/stats'),
+  getUsers: (params) => api.get('/admin/users', { params }),
+  getUserDetails: (id) => api.get(`/admin/users/${id}`),
+  updateUserStatus: (id, status) => api.patch(`/admin/users/${id}/status`, { status }),
+  updateUserRole: (id, role) => api.patch(`/admin/users/${id}/role`, { role }),
+  getRevenueMetrics: () => api.get('/admin/metrics/revenue'),
+  getTransactions: (params) => api.get('/admin/transactions', { params }),
+  getSystemHealth: () => api.get('/admin/health'),
+  getFeatureUsage: () => api.get('/admin/features/usage'),
+  getAnalytics: (days) => api.get('/admin/analytics', { params: { days } }),
+  getWebhooks: () => api.get('/admin/webhooks'),
+  createWebhook: (url, events) => api.post('/admin/webhooks', { url, events }),
+  deleteWebhook: (id) => api.delete(`/admin/webhooks/${id}`),
+}
+
+// Demo API
+export const demoAPI = {
+  startDemo: () => api.post('/demo/start'),
+  getFeatures: () => api.get('/demo/features'),
+  getStatus: (token) => api.get('/demo/status', { params: { demo_token: token } }),
+  endDemo: (token) => api.post('/demo/end', { demo_token: token }),
+}
+
+export default api
