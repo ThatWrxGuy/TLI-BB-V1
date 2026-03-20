@@ -1,6 +1,6 @@
 import { Box, Flex, HStack, VStack, Text, Avatar, Menu, MenuButton, MenuList, MenuItem, IconButton, useDisclosure, Drawer, DrawerOverlay, DrawerContent, DrawerBody, useBreakpointValue } from '@chakra-ui/react'
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
-import { FiHome, FiGrid, FiDollarSign, FiUser, FiSettings, FiLogOut, FiMenu, FiX, FiBell, FiActivity, FiBarChart2 } from 'react-icons/fi'
+import { FiHome, FiGrid, FiDollarSign, FiUser, FiSettings, FiLogOut, FiMenu, FiX, FiBell, FiActivity, FiBarChart2, FiTrendingUp } from 'react-icons/fi'
 import { useAuth } from '../context/AuthContext'
 
 const NavItem = ({ to, icon: Icon, children, onClick }) => {
@@ -53,6 +53,7 @@ function Sidebar({ onClose }) {
       {/* Nav Items */}
       <VStack px={2} spacing={1} align="stretch" flex={1}>
         <NavItem to="/dashboard" icon={FiHome} onClick={onClose}>Dashboard</NavItem>
+        <NavItem to="/my-analytics" icon={FiTrendingUp} onClick={onClose}>My Analytics</NavItem>
         <NavItem to="/finance" icon={FiDollarSign} onClick={onClose}>Finance</NavItem>
         <NavItem to="/profile" icon={FiUser} onClick={onClose}>Profile</NavItem>
         <NavItem to="/settings" icon={FiSettings} onClick={onClose}>Settings</NavItem>

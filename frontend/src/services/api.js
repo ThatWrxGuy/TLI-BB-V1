@@ -190,4 +190,16 @@ export const analyticsAPI = {
   exportAnalytics: (format, days) => api.get('/analytics/export', { params: { format, days } }),
 }
 
+// User Analytics API
+export const userAnalyticsAPI = {
+  getActivity: (days) => api.get('/user-analytics/activity', { params: { days } }),
+  getProgress: () => api.get('/user-analytics/progress'),
+  getStreaks: () => api.get('/user-analytics/streaks'),
+  getAchievements: () => api.get('/user-analytics/achievements'),
+  getWeeklyReport: () => api.get('/user-analytics/weekly-report'),
+  getInsights: () => api.get('/user-analytics/insights'),
+  getBenchmark: () => api.get('/user-analytics/benchmark'),
+  getSummary: () => api.get('/user-analytics/summary'),
+}
+
 export default api

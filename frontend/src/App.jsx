@@ -11,6 +11,7 @@ import Settings from './pages/Settings'
 import Finance from './pages/Finance'
 import Admin from './pages/Admin'
 import Analytics from './pages/Analytics'
+import UserAnalytics from './pages/UserAnalytics'
 import Onboarding from './pages/Onboarding'
 import Demo from './pages/Demo'
 
@@ -103,6 +104,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Analytics />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="my-analytics" 
+            element={
+              <ProtectedRoute>
+                <UserAnalytics />
               </ProtectedRoute>
             } 
           />

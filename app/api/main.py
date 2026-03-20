@@ -80,6 +80,7 @@ from app.api import push_notifications as push_router
 from app.api import upload as upload_router
 from app.api import websocket as websocket_router
 from app.api import analytics as analytics_router
+from app.api import user_analytics as user_analytics_router
 
 try:
     from tree_engine.api import router as tree_router
@@ -155,6 +156,9 @@ app.include_router(websocket_router.router, tags=["WebSocket"])
 
 # Analytics routes
 app.include_router(analytics_router.router)
+
+# User Analytics routes
+app.include_router(user_analytics_router.router)
 
 
 # ==================== HEALTH & STATUS ====================
