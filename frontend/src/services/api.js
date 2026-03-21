@@ -204,14 +204,45 @@ export const userAnalyticsAPI = {
 
 // Life Domains API
 export const domainsAPI = {
-  getDomains: () => api.get('/domains'),
-  getDomain: (id) => api.get(`/domains/${id}`),
-  getDomainGoals: (id) => api.get(`/domains/${id}/goals`),
-  getDomainProgress: (id) => api.get(`/domains/${id}/progress`),
-  getDomainStats: (id) => api.get(`/domains/${id}/stats`),
-  getDomainCheckins: (id, days) => api.get(`/domains/${id}/checkins`, { params: { days } }),
-  createCheckin: (id, status, notes) => api.post(`/domains/${id}/checkin`, { status, notes }),
-  getAllProgress: () => api.get('/domains/progress/all'),
+  // ── existing ──────────────────────────────────────────────────────────────
+  getDomains:        ()                        => api.get('/domains'),
+  getDomain:         (id)                      => api.get(`/domains/${id}`),
+  getDomainGoals:    (id)                      => api.get(`/domains/${id}/goals`),
+  getDomainProgress: (id)                      => api.get(`/domains/${id}/progress`),
+  getDomainStats:    (id)                      => api.get(`/domains/${id}/stats`),
+  getDomainCheckins: (id, days)                => api.get(`/domains/${id}/checkins`, { params: { days } }),
+  createCheckin:     (id, status, notes)       => api.post(`/domains/${id}/checkin`, { status, notes }),
+
+  // ── v2: goal CRUD + sparklines ─────────────────────────────────────────────
+  getAllProgress: ()                            => api.get('/domains/progress/all'),
+
+  createGoal: (domainId, title, description, category, targetDate) =>
+    api.post(`/domains/${domainId}/goals`, {
+      title,
+      description: description || null,
+      category:    category    || null,
+      target_date: targetDate  || null,
+    }),
+
+  updateGoal:       (goalId, progress)         => api.patch(`/domains/goals/${goalId}`, { progress }),
+  updateGoalStatus: (goalId, status)           => api.patch(`/domains/goals/${goalId}`, { status }),
+  deleteGoal:       (goalId)                   => api.delete(`/domains/goals/${goalId}`),
+  getGoalHistory:   (goalId, limit = 30)       => api.get(`/domains/goals/${goalId}/history`, { params: { limit } }),
+
+  // ── v3: weekly snapshots + radar ───────────────────────────────────────────
+  getRadarData:       (weeks = 8)              => api.get('/domains/snapshots/radar', { params: { weeks } }),
+  getSnapshotHistory: (domainId, weeks = 8)    => api.get('/domains/snapshots/history', { params: { domain_id: domainId, weeks } }),
+  triggerSnapshot:    ()                       => api.post('/domains/snapshot'),
+
+  // ── v4: goal detail drawer — field editing ─────────────────────────────────
+  // Sends title, description, category, target_date in a single PATCH
+  updateGoalFields: (goalId, fields) =>
+    api.patch(`/domains/goals/${goalId}`, {
+      ...(fields.title       !== undefined && { title:       fields.title }),
+      ...(fields.description !== undefined && { description: fields.description }),
+      ...(fields.category    !== undefined && { category:    fields.category }),
+      ...(fields.target_date !== undefined && { target_date: fields.target_date }),
+    }),
 }
 
 export default api
