@@ -328,7 +328,7 @@ function Dashboard() {
         <StatCard loading={loading} icon={FiTrendingUp} label="Active Goals"   value={overview.active_goals || 0} />
         <StatCard loading={loading} icon={FiCheck}      label="Completed"      value={overview.completed_goals || 0} />
         <StatCard loading={loading} icon={FiClock}      label="Pending"        value={overview.pending_recommendations || 0} helpText="Recommendations" />
-        <StatCard loading={loading} icon={FiZap}        label="Streak"         value={`${overview.streak_days || 0}d`} trend={12} />
+        <StatCard loading={loading} icon={FiZap}        label="Streak"         value={`${overview.streak_days || 0}d`} trend={overview.streak_trend || null} />
       </SimpleGrid>
 
       {/* Main 2-col grid */}
