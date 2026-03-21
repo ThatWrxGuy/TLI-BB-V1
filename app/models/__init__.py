@@ -12,6 +12,13 @@ from app.models.user import (
     Subscription,
 )
 
+from app.models.domain_models import (
+    DomainGoal,
+    DomainCheckIn,
+    GoalProgressLog,
+    DomainWeeklySnapshot,
+)
+
 __all__ = [
     "User",
     "UserCreate",
@@ -19,4 +26,8 @@ __all__ = [
     "SubscriptionTier",
     "OAuthProvider",
     "Subscription",
+    "DomainGoal",
+    "DomainCheckIn",
+    "GoalProgressLog",
+    "DomainWeeklySnapshot",
 ]
