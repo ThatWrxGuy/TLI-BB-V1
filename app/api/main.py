@@ -82,6 +82,7 @@ from app.api import websocket as websocket_router
 from app.api import analytics as analytics_router
 from app.api import user_analytics as user_analytics_router
 from app.api import domains as domains_router
+from app.api import ai_suggestions as ai_suggestions_router
 
 try:
     from tree_engine.api import router as tree_router
@@ -163,6 +164,9 @@ app.include_router(user_analytics_router.router)
 
 # Life Domains routes
 app.include_router(domains_router.router)
+
+# AI Suggestions routes
+app.include_router(ai_suggestions_router.router, prefix="/api")
 
 
 # ==================== HEALTH & STATUS ====================

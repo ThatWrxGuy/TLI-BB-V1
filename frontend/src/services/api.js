@@ -243,6 +243,20 @@ export const domainsAPI = {
       ...(fields.category    !== undefined && { category:    fields.category }),
       ...(fields.target_date !== undefined && { target_date: fields.target_date }),
     }),
+
+  // ── v5: AI suggestions ─────────────────────────────────────────────────────
+  getSuggestions:    ()                        => api.get('/suggestions'),
+  generateSuggestions: ()                      => api.post('/suggestions/generate'),
+  acceptSuggestion:  (id, accepted)            => api.post(`/suggestions/${id}/accept`, { accepted }),
+}
+
+// ─── Push notification API ────────────────────────────────────────────────────
+
+export const pushAPI = {
+  subscribe:   (subscription) => api.post('/push/subscribe',   subscription),
+  unsubscribe: (endpoint)     => api.post('/push/unsubscribe', { endpoint }),
+  status:      ()             => api.get('/push/status'),
+  test:        ()             => api.post('/push/test'),
 }
 
 export default api

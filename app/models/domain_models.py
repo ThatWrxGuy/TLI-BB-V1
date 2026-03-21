@@ -4,8 +4,11 @@
 """SQLAlchemy models for Domain Goals, Check-ins, Progress Log, and Weekly Snapshots.
 
 HOW TO ADD:
-  1. Already added to app/models/domain_models.py
-  2. Already added to app/models/__init__.py
+  1. cp db_models.py app/models/domain_models.py
+  2. In app/models/__init__.py add:
+       from app.models.domain_models import (
+           DomainGoal, DomainCheckIn, GoalProgressLog, DomainWeeklySnapshot
+       )
   3. Run migration (see alembic_migration.py)
 """
 
@@ -21,7 +24,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.models.database import Base   # ← adjusts to use existing Base
+from app.models.database import Base   # ← adjust if needed
 
 
 def _uuid() -> str:
@@ -121,7 +124,7 @@ class GoalProgressLog(Base):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# DomainWeeklySnapshot
+# DomainWeeklySnapshot  ← NEW
 # ─────────────────────────────────────────────────────────────────────────────
 
 class DomainWeeklySnapshot(Base):
