@@ -19,6 +19,7 @@ import Tasks from './pages/Tasks'
 import Notifications from './pages/Notifications'
 import Subscription from './pages/Subscription'
 import Help from './pages/Help'
+import Domains from './pages/Domains'
 
 // Layout
 import Layout from './components/Layout'
@@ -122,6 +123,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <UserAnalytics />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="domains" 
+            element={
+              <ProtectedRoute>
+                <Domains />
               </ProtectedRoute>
             } 
           />

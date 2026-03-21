@@ -202,4 +202,16 @@ export const userAnalyticsAPI = {
   getSummary: () => api.get('/user-analytics/summary'),
 }
 
+// Life Domains API
+export const domainsAPI = {
+  getDomains: () => api.get('/domains'),
+  getDomain: (id) => api.get(`/domains/${id}`),
+  getDomainGoals: (id) => api.get(`/domains/${id}/goals`),
+  getDomainProgress: (id) => api.get(`/domains/${id}/progress`),
+  getDomainStats: (id) => api.get(`/domains/${id}/stats`),
+  getDomainCheckins: (id, days) => api.get(`/domains/${id}/checkins`, { params: { days } }),
+  createCheckin: (id, status, notes) => api.post(`/domains/${id}/checkin`, { status, notes }),
+  getAllProgress: () => api.get('/domains/progress/all'),
+}
+
 export default api

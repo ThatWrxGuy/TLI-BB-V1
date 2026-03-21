@@ -1,6 +1,6 @@
 import { Box, Flex, HStack, VStack, Text, Avatar, Menu, MenuButton, MenuList, MenuItem, IconButton, useDisclosure, Drawer, DrawerOverlay, DrawerContent, DrawerBody, useBreakpointValue } from '@chakra-ui/react'
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
-import { FiHome, FiGrid, FiDollarSign, FiUser, FiSettings, FiLogOut, FiMenu, FiX, FiBell, FiActivity, FiBarChart2, FiTrendingUp, FiTarget, FiCheck, FiCreditCard, FiHelpCircle } from 'react-icons/fi'
+import { FiHome, FiGrid, FiDollarSign, FiUser, FiSettings, FiLogOut, FiMenu, FiX, FiBell, FiActivity, FiBarChart2, FiTrendingUp, FiTarget, FiCheck, FiCreditCard, FiHelpCircle, FiGrid as FiDomains } from 'react-icons/fi'
 import { useAuth } from '../context/AuthContext'
 
 const NavItem = ({ to, icon: Icon, children, onClick }) => {
@@ -54,6 +54,7 @@ function Sidebar({ onClose }) {
       <VStack px={2} spacing={1} align="stretch" flex={1}>
         <Text fontSize="xs" fontWeight="600" color="gray.400" px={3} py={2}>MAIN</Text>
         <NavItem to="/dashboard" icon={FiHome} onClick={onClose}>Dashboard</NavItem>
+        <NavItem to="/domains" icon={FiDomains} onClick={onClose}>Life Domains</NavItem>
         <NavItem to="/goals" icon={FiTarget} onClick={onClose}>Goals</NavItem>
         <NavItem to="/tasks" icon={FiCheck} onClick={onClose}>Tasks</NavItem>
         <NavItem to="/my-analytics" icon={FiTrendingUp} onClick={onClose}>My Analytics</NavItem>

@@ -81,6 +81,7 @@ from app.api import upload as upload_router
 from app.api import websocket as websocket_router
 from app.api import analytics as analytics_router
 from app.api import user_analytics as user_analytics_router
+from app.api import domains as domains_router
 
 try:
     from tree_engine.api import router as tree_router
@@ -159,6 +160,9 @@ app.include_router(analytics_router.router)
 
 # User Analytics routes
 app.include_router(user_analytics_router.router)
+
+# Life Domains routes
+app.include_router(domains_router.router)
 
 
 # ==================== HEALTH & STATUS ====================
