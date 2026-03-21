@@ -14,12 +14,17 @@ import Analytics from './pages/Analytics'
 import UserAnalytics from './pages/UserAnalytics'
 import Onboarding from './pages/Onboarding'
 import Demo from './pages/Demo'
+import Goals from './pages/Goals'
+import Tasks from './pages/Tasks'
+import Notifications from './pages/Notifications'
+import Subscription from './pages/Subscription'
+import Help from './pages/Help'
 
 // Layout
 import Layout from './components/Layout'
 
-function ProtectedRoute({ children }) {
-  const { isAuthenticated, loading } = useAuth()
+function ProtectedRoute({ children, requireAdmin = false }) {
+  const { isAuthenticated, loading, user } = useAuth()
 
   if (loading) {
     return (
@@ -31,6 +36,10 @@ function ProtectedRoute({ children }) {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
+  }
+
+  if (requireAdmin && user?.role !== 'admin') {
+    return <Navigate to="/dashboard" replace />
   }
 
   return children
@@ -91,10 +100,11 @@ function App() {
               </ProtectedRoute>
             } 
           />
+          {/* Admin routes - protected, not shown in sidebar */}
           <Route 
             path="admin" 
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requireAdmin>
                 <Admin />
               </ProtectedRoute>
             } 
@@ -102,7 +112,7 @@ function App() {
           <Route 
             path="analytics" 
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requireAdmin>
                 <Analytics />
               </ProtectedRoute>
             } 
@@ -112,6 +122,46 @@ function App() {
             element={
               <ProtectedRoute>
                 <UserAnalytics />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="goals" 
+            element={
+              <ProtectedRoute>
+                <Goals />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="tasks" 
+            element={
+              <ProtectedRoute>
+                <Tasks />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="notifications" 
+            element={
+              <ProtectedRoute>
+                <Notifications />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="subscription" 
+            element={
+              <ProtectedRoute>
+                <Subscription />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="help" 
+            element={
+              <ProtectedRoute>
+                <Help />
               </ProtectedRoute>
             } 
           />

@@ -1,6 +1,6 @@
 import { Box, Flex, HStack, VStack, Text, Avatar, Menu, MenuButton, MenuList, MenuItem, IconButton, useDisclosure, Drawer, DrawerOverlay, DrawerContent, DrawerBody, useBreakpointValue } from '@chakra-ui/react'
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
-import { FiHome, FiGrid, FiDollarSign, FiUser, FiSettings, FiLogOut, FiMenu, FiX, FiBell, FiActivity, FiBarChart2, FiTrendingUp } from 'react-icons/fi'
+import { FiHome, FiGrid, FiDollarSign, FiUser, FiSettings, FiLogOut, FiMenu, FiX, FiBell, FiActivity, FiBarChart2, FiTrendingUp, FiTarget, FiCheck, FiCreditCard, FiHelpCircle } from 'react-icons/fi'
 import { useAuth } from '../context/AuthContext'
 
 const NavItem = ({ to, icon: Icon, children, onClick }) => {
@@ -50,19 +50,29 @@ function Sidebar({ onClose }) {
         </VStack>
       </HStack>
 
-      {/* Nav Items */}
+      {/* Main Nav */}
       <VStack px={2} spacing={1} align="stretch" flex={1}>
+        <Text fontSize="xs" fontWeight="600" color="gray.400" px={3} py={2}>MAIN</Text>
         <NavItem to="/dashboard" icon={FiHome} onClick={onClose}>Dashboard</NavItem>
+        <NavItem to="/goals" icon={FiTarget} onClick={onClose}>Goals</NavItem>
+        <NavItem to="/tasks" icon={FiCheck} onClick={onClose}>Tasks</NavItem>
         <NavItem to="/my-analytics" icon={FiTrendingUp} onClick={onClose}>My Analytics</NavItem>
         <NavItem to="/finance" icon={FiDollarSign} onClick={onClose}>Finance</NavItem>
+      </VStack>
+
+      {/* Support Section */}
+      <VStack px={2} spacing={1} align="stretch">
+        <Text fontSize="xs" fontWeight="600" color="gray.400" px={3} py={2}>SUPPORT</Text>
+        <NavItem to="/notifications" icon={FiBell} onClick={onClose}>Notifications</NavItem>
+        <NavItem to="/subscription" icon={FiCreditCard} onClick={onClose}>Subscription</NavItem>
+        <NavItem to="/help" icon={FiHelpCircle} onClick={onClose}>Help & Support</NavItem>
+      </VStack>
+
+      {/* Account Section */}
+      <VStack px={2} spacing={1} align="stretch">
+        <Text fontSize="xs" fontWeight="600" color="gray.400" px={3} py={2}>ACCOUNT</Text>
         <NavItem to="/profile" icon={FiUser} onClick={onClose}>Profile</NavItem>
         <NavItem to="/settings" icon={FiSettings} onClick={onClose}>Settings</NavItem>
-        {user?.role === 'admin' && (
-          <>
-            <NavItem to="/admin" icon={FiActivity} onClick={onClose}>Admin</NavItem>
-            <NavItem to="/analytics" icon={FiBarChart2} onClick={onClose}>Analytics</NavItem>
-          </>
-        )}
       </VStack>
 
       {/* User */}
