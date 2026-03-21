@@ -15,10 +15,25 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
-    const success = await login(email, password)
-    setLoading(false)
-    if (success) {
-      navigate('/dashboard')
+    try {
+      const formData = new URLSearchParams({ username: email, password })
+      const response = await fetch('http://localhost:8000/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: formData
+      })
+      const data = await response.json()
+      
+      if (response.ok && data.access_token) {
+        localStorage.setItem('token', data.access_token)
+        navigate('/dashboard', { replace: true })
+      } else {
+        console.error('Login failed:', data)
+      }
+    } catch (err) {
+      console.error('Login error:', err)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -99,11 +114,12 @@ function Login() {
             </HStack>
 
             <Button
-              type="submit"
+              type="button"
               w="full"
               size="lg"
               isLoading={loading}
               loadingText="Signing in..."
+              onClick={handleSubmit}
             >
               Sign In
             </Button>
